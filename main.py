@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def df_from_postgres(query):
+def df_from_postgres(query, connection_string):
 
     alchemyEngine = create_engine(connection_string)
     dbConnection = alchemyEngine.connect()
@@ -52,7 +52,7 @@ if __name__=='__main__':
         sec = v1.read_namespaced_secret("airflow-db", namespace).data
         connection_string = base64.b64decode(sec["connection"]).decode()
 
-        df_dag_runs = df_from_postgres(query_dag_runs)
+        df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
 
