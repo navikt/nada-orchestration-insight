@@ -54,6 +54,11 @@ if __name__=='__main__':
         sec = v1.read_namespaced_secret("airflow-db", namespace).data
         connection_string = base64.b64decode(sec["connection"]).decode()
 
+        connection_string_parts = connection_string.split(":5432")
+        if len(connection_string_parts) != 2:
+            raise Exception("invalid connection string format")
+        connection_string = connection_string_parts[0] + f".{namespace}" + connection_string_parts[1]
+
         df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
