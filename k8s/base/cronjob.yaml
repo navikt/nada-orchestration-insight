@@ -11,8 +11,9 @@ spec:
   jobTemplate:
     spec:
       template:
-        labels:
-          job: knada-insight
+        metadata:
+          labels:
+            job: knada-insight
         spec:
           serviceAccountName: orchestration-insight
           restartPolicy: Never
