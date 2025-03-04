@@ -1,2 +1,7 @@
 resources:
 - ../../base
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: europe-north1-docker.pkg.dev/knada-gcp/knada-north/orchestration-insight
+  newTag: a98c92ceff82d15fe6cbd0297739900bf4555661
