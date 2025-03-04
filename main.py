@@ -28,7 +28,7 @@ def replace_old_table_in_bigquery(table_id: str, client: bigquery.Client):
 
     job.result()
 
-    logger.info(f"Replaced table {table_id} with {table_id}_new")
+    logger.info(f"Replaced table {table_id} with {table_id}_staging")
 
 
 def ensure_namespace_is_part_of_db_host(connection_string: str, namespace: str) -> str:
