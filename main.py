@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 def df_from_postgres(query, connection_string):
-
     alchemyEngine = create_engine(connection_string)
     dbConnection = alchemyEngine.connect()
 
@@ -32,9 +31,6 @@ def replace_old_table_in_bigquery(table_id: str, client: bigquery.Client):
     logger.info(f"Replaced table {table_id} with {table_id}_new")
 
 
-query_dag_runs = "select * from dag_run left join dag on dag.dag_id=dag_run.dag_id"
-
-
 def ensure_namespace_is_part_of_db_host(connection_string: str, namespace: str) -> str:
     connection_string_parts = connection_string.split(":5432")
     if len(connection_string_parts) != 2:
@@ -50,8 +46,6 @@ def ensure_namespace_is_part_of_db_host(connection_string: str, namespace: str) 
 
 
 if __name__=='__main__':
-
-
     config.load_incluster_config()
     v1 = client.CoreV1Api()
 
@@ -69,6 +63,8 @@ if __name__=='__main__':
         connection_string = base64.b64decode(sec["connection"]).decode()
 
         connection_string = ensure_namespace_is_part_of_db_host(connection_string, namespace)
+
+        query_dag_runs = "select * from dag_run left join dag on dag.dag_id=dag_run.dag_id"
         df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
@@ -76,18 +72,16 @@ if __name__=='__main__':
         df_bigquery = df_dag_runs[["dag_id", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
         df_bigquery = df_bigquery.loc[:, ~df_bigquery.T.duplicated()]
 
-        project = "nada-prod-6977"
+        dataset_project = "nada-prod-6977"
         dataset = "knorten_north"
 
-        table_id = f"{project}.{dataset}.airflow_dagruns"
+        table_id = f"{dataset_project}.{dataset}.airflow_dagruns"
 
-        client = bigquery.Client(project=project)
-
-        
+        client = bigquery.Client()
         job_config = bigquery.LoadJobConfig(
                 autodetect=True,
                 write_disposition="WRITE_TRUNCATE" if i == 0 else "WRITE_APPEND",
-            )
+        )
         
         logger.info(f"Writing stats for {namespace} to table {table_id}_staging")
 
