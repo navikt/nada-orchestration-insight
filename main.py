@@ -35,6 +35,20 @@ def replace_old_table_in_bigquery(table_id: str, client: bigquery.Client):
 query_dag_runs = "select * from dag_run left join dag on dag.dag_id=dag_run.dag_id"
 
 
+def ensure_namespace_is_part_of_db_host(connection_string: str, namespace: str) -> str:
+    connection_string_parts = connection_string.split(":5432")
+    if len(connection_string_parts) != 2:
+        raise Exception("invalid connection string format")
+    
+    before_port = connection_string_parts[0]
+    after_port = connection_string_parts[1]
+
+    if "." in before_port.split("@")[1]:
+        return connection_string
+
+    return before_port + f".{namespace}:5432" + after_port
+
+
 if __name__=='__main__':
 
 
@@ -54,11 +68,7 @@ if __name__=='__main__':
         sec = v1.read_namespaced_secret("airflow-db", namespace).data
         connection_string = base64.b64decode(sec["connection"]).decode()
 
-        connection_string_parts = connection_string.split(":5432")
-        if len(connection_string_parts) != 2:
-            raise Exception("invalid connection string format")
-        connection_string = connection_string_parts[0] + f".{namespace}" + connection_string_parts[1]
-
+        connection_string = ensure_namespace_is_part_of_db_host(connection_string, namespace)
         df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
