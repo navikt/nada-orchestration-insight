@@ -1,4 +1,4 @@
-name: Build and push expired-cert-notify image to GAR
+name: Build and push nada-orchestration-insight image to GAR
 
 on:
   push:
