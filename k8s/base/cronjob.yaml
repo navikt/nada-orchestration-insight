@@ -3,8 +3,6 @@ kind: CronJob
 metadata:
   name: orchestration-insight
   namespace: knada-insight
-  labels:
-    job: knada-insight
 spec:
   schedule: "0 8 * * *"
   successfulJobsHistoryLimit: 1
@@ -13,6 +11,8 @@ spec:
   jobTemplate:
     spec:
       template:
+        labels:
+          job: knada-insight
         spec:
           serviceAccountName: orchestration-insight
           restartPolicy: Never
