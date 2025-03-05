@@ -50,15 +50,13 @@ if __name__=='__main__':
     v1 = client.CoreV1Api()
 
     logger.info("Listing secrets for all namespaces")
-    secrets = v1.list_secret_for_all_namespaces(field_selector='metadata.name=airflow-db')
-    namespaces_with_airflow = []
-    for item in secrets.items:
-        namespaces_with_airflow.append(item.metadata.namespace)
 
-    for i, namespace in enumerate(namespaces_with_airflow):
+    secrets = v1.list_secret_for_all_namespaces(field_selector='metadata.name=airflow-db')
+    for i, secret in enumerate(secrets.items):
+        namespace = secret.metadata.namespace
+
         logger.info(f"Processing namespace {namespace}")
-        sec = v1.read_namespaced_secret("airflow-db", namespace).data
-        connection_string = base64.b64decode(sec["connection"]).decode()
+        connection_string = base64.b64decode(secret.data["connection"]).decode()
 
         connection_string = ensure_namespace_is_part_of_db_host(connection_string, namespace)
 
