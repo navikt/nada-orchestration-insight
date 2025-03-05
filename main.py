@@ -64,7 +64,7 @@ if __name__=='__main__':
 select 
     task_instance.task_id as task_id, 
     task_instance.duration as task_duration, 
-    task_instance.status as task_status, 
+    task_instance.state as task_status, 
     dag_run.*, 
     dag.schedule_interval as schedule_interval, 
     dag.max_active_tasks as max_active_tasks, 
