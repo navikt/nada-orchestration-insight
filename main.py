@@ -54,8 +54,6 @@ if __name__=='__main__':
     namespaces_with_airflow = []
     for item in secrets.items:
         namespaces_with_airflow.append(item.metadata.namespace)
-
-    namespaces_with_airflow = ["team-nada-oqs1"]
     
     for i, namespace in enumerate(namespaces_with_airflow):
         logger.info(f"Processing namespace {namespace}")
