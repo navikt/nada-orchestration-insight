@@ -60,12 +60,24 @@ if __name__=='__main__':
 
         connection_string = ensure_namespace_is_part_of_db_host(connection_string, namespace)
 
-        query_dag_runs = "select dag_run.*, dag.schedule_interval as schedule_interval, dag.max_active_tasks as max_active_tasks, dag.max_active_runs as max_active_runs from dag_run left join dag on dag.dag_id=dag_run.dag_id"
+        query_dag_runs = """
+select 
+    task_instance.task_id as task_id, 
+    task_instance.duration as task_duration, 
+    task_instance.status as task_status, 
+    dag_run.*, 
+    dag.schedule_interval as schedule_interval, 
+    dag.max_active_tasks as max_active_tasks, 
+    dag.max_active_runs as max_active_runs 
+from task_instance 
+left join dag_run on dag_run.run_id=task_instance.run_id
+left join dag on dag.dag_id=dag_run.dag_id
+"""
         df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
 
-        df_bigquery = df_dag_runs[["dag_id", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
+        df_bigquery = df_dag_runs[["task_id", "task_duration", "task_status", "dag_id", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
 
         dataset_project = "nada-prod-6977"
         dataset = "knorten_north"
