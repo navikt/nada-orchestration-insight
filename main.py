@@ -64,13 +64,12 @@ if __name__=='__main__':
 
         connection_string = ensure_namespace_is_part_of_db_host(connection_string, namespace)
 
-        query_dag_runs = "select * from dag_run left join dag on dag.dag_id=dag_run.dag_id"
+        query_dag_runs = "select dag_run.*, dag.schedule_interval as schedule_interval, dag.max_active_tasks as max_active_tasks, dag.max_active_runs as max_active_runs from dag_run left join dag on dag.dag_id=dag_run.dag_id"
         df_dag_runs = df_from_postgres(query_dag_runs, connection_string)
 
         df_dag_runs["namespace"] = namespace
 
         df_bigquery = df_dag_runs[["dag_id", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
-        df_bigquery = df_bigquery.loc[:, ~df_bigquery.T.duplicated()]
 
         dataset_project = "nada-prod-6977"
         dataset = "knorten_north"
@@ -82,12 +81,12 @@ if __name__=='__main__':
                 autodetect=True,
                 write_disposition="WRITE_TRUNCATE" if i == 0 else "WRITE_APPEND",
         )
-        
+
         logger.info(f"Writing stats for {namespace} to table {table_id}_staging")
 
         job = client.load_table_from_dataframe(
             df_bigquery, table_id + "_staging", job_config=job_config
         )
-    
+
     logger.info(f"Replacing table {table_id} with {table_id}_staging")
     replace_old_table_in_bigquery(table_id, client)
