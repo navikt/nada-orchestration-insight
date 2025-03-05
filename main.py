@@ -54,7 +54,7 @@ if __name__=='__main__':
     namespaces_with_airflow = []
     for item in secrets.items:
         namespaces_with_airflow.append(item.metadata.namespace)
-    
+
     for i, namespace in enumerate(namespaces_with_airflow):
         logger.info(f"Processing namespace {namespace}")
         sec = v1.read_namespaced_secret("airflow-db", namespace).data
