@@ -4,4 +4,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: europe-north1-docker.pkg.dev/knada-gcp/knada-north/orchestration-insight
-  newTag: 127366685ee544995c9d1f21d054b8f3474df2f0
+  newTag: 69ec1e006cc3fa9462cc7cd6138a62dd34a2ec57
