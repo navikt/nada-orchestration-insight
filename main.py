@@ -59,7 +59,7 @@ if __name__=='__main__':
     logger.info("Listing secrets for all namespaces")
 
     secrets = v1.list_secret_for_all_namespaces(field_selector='metadata.name=airflow-db')
-    for i, secret in enumerate(secrets.items):
+    for secret in secrets.items:
         namespace = secret.metadata.namespace
 
         logger.info(f"Processing namespace {namespace}")
@@ -93,8 +93,8 @@ left join dag on dag.dag_id=dag_run.dag_id
 
         client = bigquery.Client()
         job_config = bigquery.LoadJobConfig(
-                autodetect=True,
-                write_disposition="WRITE_APPEND",
+            autodetect=True,
+            write_disposition="WRITE_APPEND",
         )
  
         logger.info(f"Writing stats for {namespace} to table {table_id}{STAGING_POSTFIX}")
