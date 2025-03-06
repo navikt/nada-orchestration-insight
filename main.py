@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+STAGING_POSTFIX="_staging"
 
 def df_from_postgres(query, connection_string):
     alchemyEngine = create_engine(connection_string)
@@ -23,12 +24,18 @@ def replace_old_table_in_bigquery(table_id: str, client: bigquery.Client):
     job_config = bigquery.CopyJobConfig()
     job_config.write_disposition = "WRITE_TRUNCATE"
     job = client.copy_table(
-        table_id + "_staging", table_id, location="europe-north1", job_config=job_config,
+        table_id + STAGING_POSTFIX, table_id, location="europe-north1", job_config=job_config,
     )
 
     job.result()
 
-    logger.info(f"Replaced table {table_id} with {table_id}_staging")
+    logger.info(f"Replaced table {table_id} with {table_id}{STAGING_POSTFIX}")
+
+
+def delete_staging_table(table_id: str, client: bigquery.Client):
+    client.delete_table(table_id + STAGING_POSTFIX, not_found_ok=True)
+
+    logger.info(f"Deleted table {table_id}{STAGING_POSTFIX}")
 
 
 def ensure_namespace_is_part_of_db_host(connection_string: str, namespace: str) -> str:
@@ -87,14 +94,15 @@ left join dag on dag.dag_id=dag_run.dag_id
         client = bigquery.Client()
         job_config = bigquery.LoadJobConfig(
                 autodetect=True,
-                write_disposition="WRITE_TRUNCATE" if i == 0 else "WRITE_APPEND",
+                write_disposition="WRITE_APPEND",
         )
-
-        logger.info(f"Writing stats for {namespace} to table {table_id}_staging")
+ 
+        logger.info(f"Writing stats for {namespace} to table {table_id}{STAGING_POSTFIX}")
 
         job = client.load_table_from_dataframe(
-            df_bigquery, table_id + "_staging", job_config=job_config
+            df_bigquery, table_id + STAGING_POSTFIX, job_config=job_config
         )
 
-    logger.info(f"Replacing table {table_id} with {table_id}_staging")
+    logger.info(f"Replacing table {table_id} with {table_id}{STAGING_POSTFIX}")
     replace_old_table_in_bigquery(table_id, client)
+    delete_staging_table(table_id, client)
