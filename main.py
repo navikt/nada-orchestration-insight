@@ -102,6 +102,7 @@ left join dag on dag.dag_id=dag_run.dag_id
         job = client.load_table_from_dataframe(
             df_bigquery, table_id + STAGING_POSTFIX, job_config=job_config
         )
+        job.result()
 
     logger.info(f"Replacing table {table_id} with {table_id}{STAGING_POSTFIX}")
     replace_old_table_in_bigquery(table_id, client)
