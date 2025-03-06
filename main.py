@@ -84,7 +84,7 @@ left join dag on dag.dag_id=dag_run.dag_id
 
         df_dag_runs["namespace"] = namespace
 
-        df_bigquery = df_dag_runs[["task_id", "task_duration", "task_status", "dag_id", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
+        df_bigquery = df_dag_runs[["task_id", "task_duration", "task_status", "dag_id", "start_date", "end_date", "execution_date", "state", "run_id", "external_trigger", "run_type", "schedule_interval", "max_active_tasks", "max_active_runs", "namespace"]]
 
         dataset_project = "nada-prod-6977"
         dataset = "knorten_north"
