@@ -105,4 +105,4 @@ left join dag on dag.dag_id=dag_run.dag_id
 
     logger.info(f"Replacing table {table_id} with {table_id}{STAGING_POSTFIX}")
     replace_old_table_in_bigquery(table_id, client)
-    delete_staging_table(table_id, client)
+    #delete_staging_table(table_id, client)
