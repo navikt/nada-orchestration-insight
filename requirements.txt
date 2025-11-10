@@ -1,7 +1,7 @@
-google-cloud-bigquery==3.36.0
-kubernetes==33.1.0
-pandas==2.3.2
-pandas-gbq==0.29.2
-psycopg2-binary==2.9.10
-pyarrow==21.0.0
-sqlalchemy==2.0.43
+google-cloud-bigquery==3.38.0
+kubernetes==34.1.0
+pandas==2.3.3
+pandas-gbq==0.30.0
+psycopg2-binary==2.9.11
+pyarrow==22.0.0
+sqlalchemy==2.0.44
