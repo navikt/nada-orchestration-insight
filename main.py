@@ -6,6 +6,7 @@ import psycopg2
 from google.cloud import bigquery
 from kubernetes import client, config
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -13,7 +14,8 @@ logger = logging.getLogger(__name__)
 STAGING_POSTFIX="_staging"
 
 def df_from_postgres(query, connection_string):
-    alchemyEngine = create_engine(connection_string)
+    url = make_url(connection_string).set(drivername="postgresql+psycopg2")
+    alchemyEngine = create_engine(url)
     dbConnection = alchemyEngine.connect()
 
     return pd.read_sql(query,
